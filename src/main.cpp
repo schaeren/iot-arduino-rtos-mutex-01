@@ -8,7 +8,7 @@ uint8_t redPotPin = A0;         // ADC input for potentiometer for red LED
 uint8_t yellowPotPin = A1;      // ADC input for potentiometer for yellow LED
 
 // Configuration
-const long delayBeforeAdcRead = 2; // Wait time before ADC is read in ticks (1 tick = 15ms)
+const long delayBeforeAdcRead = 1; // Wait time before ADC is read in ticks (1 tick = 15ms)
                                    // Remark: A short recovery time between the reading of  
                                    // different ADC channels leads to more stable results.
 const long minDelay = portTICK_PERIOD_MS; // Min. delay = min. half period time for LED flashing in ms
@@ -16,8 +16,8 @@ const long maxDelay = 1000;        // Max. delay = max. half period time for LED
 
 // Half period time for LEDs, access is protected by mutex
 SemaphoreHandle_t delaysMutex;
-int16_t delayRed = -1;          // ms
-int16_t delayYellow = -1;       // ms
+int16_t delayRed = -1;      // ms
+int16_t delayYellow = -1;   // ms
 
 // struct used for task parameters
 struct TaskParams_t {
@@ -44,12 +44,12 @@ void TaskAnalogIn([[maybe_unused]] void *pvParameters )
     int16_t _delayRed = 0, _delayYellow = 0;
 
     for (;;) {
-        // Get delay for red LED by reading voltage potentiometer
+        // Get delay for red LED by reading voltage potentiometer 'red'
         vTaskDelay(delayBeforeAdcRead);                             // Wait a short time to stabilize the ADC value
         int potRedValue = analogRead(redPotPin);                    // Read value from ADC
         _delayRed = map(potRedValue, 0, 1023, minDelay, maxDelay);  // normalize ADC value to 16...1000
         
-        // Get delay for yellow LED by reading voltage potentiometer
+        // Get delay for yellow LED by reading voltage potentiometer 'yellow'
         vTaskDelay(delayBeforeAdcRead);                             // Wait a short time to stabilize the ADC value
         int potYellowValue = analogRead(yellowPotPin);              // Read value from ADC
         _delayYellow = map(potYellowValue, 0, 1023, minDelay, maxDelay); // normalize ADC value to 16...1000
